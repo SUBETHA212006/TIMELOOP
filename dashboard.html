@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Simulation Dashboard — TIMELOOP{% endblock %}
+{% block content %}
+
+<h2>Simulation Dashboard</h2>
+<p class="subtitle">Hello {{ name }}! Adjust the duration and explore your scenarios.</p>
+
+<!-- Duration slider -->
+<div class="slider-container">
+  <label for="durationSlider">Simulation Duration:</label>
+  <input type="range" id="durationSlider" min="30" max="180" step="1" value="{{ duration }}" />
+  <div class="slider-value" id="sliderLabel">{{ duration }} days</div>
+</div>
+
+<!-- Scenario cards -->
+<div class="grid grid-3" id="scenarioCards" style="margin-bottom:1.5rem;">
+  {% for key in ['baseline','improved','reduced'] %}
+  {% set sc = scenarios[key] %}
+  <div class="card scenario-card {{ key }}">
+    <span class="scenario-badge" style="background:{{ sc.color }};">{{ sc.name }}</span>
+    <div class="card-value" style="color:{{ sc.color }};">{{ sc.hours }}</div>
+    <div class="card-label">cumulative hours over <span class="dur-text">{{ duration }}</span> days</div>
+    <p style="margin-top:0.6rem; font-size:0.9rem; color:var(--text-light);">
+      Daily: <strong>{{ sc.daily }} hrs</strong>
+    </p>
+    <p style="font-size:0.85rem; color:var(--text-light);">{{ sc.description }}</p>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Line chart -->
+<div class="chart-card" style="margin-bottom:1.5rem;">
+  <h3 style="margin-bottom:0.8rem;">Cumulative Learning Hours Over Time</h3>
+  <canvas id="lineChart"></canvas>
+</div>
+
+<div class="btn-group">
+  <a href="{{ url_for('comparison') }}" class="btn btn-primary">View Comparison &rarr;</a>
+  <a href="{{ url_for('timeline') }}" class="btn btn-accent">Future Timeline &rarr;</a>
+  <a href="{{ url_for('habits') }}" class="btn btn-outline">Edit Habits</a>
+</div>
+
+<script>
+const habits = {{ habits | tojson }};
+let currentChart = null;
+
+function buildChart(chartData) {
+  const ctx = document.getElementById('lineChart').getContext('2d');
+  if (currentChart) currentChart.destroy();
+  currentChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: chartData.labels.map(d => 'Day ' + d),
+      datasets: [
+        { label: 'Baseline',  data: chartData.baseline, borderColor: '#0066cc', backgroundColor: 'rgba(0,102,204,0.08)', fill: true, tension: 0.3 },
+        { label: 'Improved',  data: chartData.improved, borderColor: '#00b894', backgroundColor: 'rgba(0,184,148,0.08)', fill: true, tension: 0.3 },
+        { label: 'Reduced',   data: chartData.reduced,  borderColor: '#e17055', backgroundColor: 'rgba(225,112,85,0.08)', fill: true, tension: 0.3 }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      scales: { y: { beginAtZero: true, title: { display: true, text: 'Hours' } },
+                x: { title: { display: true, text: 'Timeline' } } },
+      plugins: { legend: { position: 'bottom' } }
+    }
+  });
+}
+
+function refresh(dur) {
+  fetch('{{ url_for("api_calculate") }}', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ habits: habits, duration: dur })
+  })
+  .then(r => r.json())
+  .then(data => {
+    // Update cards
+    const keys = ['baseline','improved','reduced'];
+    const cards = document.querySelectorAll('.scenario-card');
+    keys.forEach((k, i) => {
+      const sc = data.scenarios[k];
+      const card = cards[i];
+      card.querySelector('.card-value').textContent = sc.hours;
+      card.querySelector('.dur-text').textContent = dur;
+      card.querySelector('p strong').textContent = sc.daily + ' hrs';
+    });
+    // Update chart
+    buildChart(data.chart);
+  });
+
+  // Persist duration in session
+  fetch('{{ url_for("set_duration") }}', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ duration: dur })
+  });
+}
+
+// Initial chart render
+buildChart({{ chart | tojson }});
+
+// Slider event
+const slider = document.getElementById('durationSlider');
+const label  = document.getElementById('sliderLabel');
+slider.addEventListener('input', function() {
+  label.textContent = this.value + ' days';
+  refresh(parseInt(this.value));
+});
+</script>
+
+{% endblock %}

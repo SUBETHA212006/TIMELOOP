@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Future Timeline — TIMELOOP{% endblock %}
+{% block content %}
+
+<h2>Future Timeline</h2>
+<p class="subtitle">Milestones at every 30 days — see your projected accumulated learning hours.</p>
+
+<!-- Scenario tabs -->
+<div class="tabs">
+  <button class="tab-btn active" data-scenario="baseline">Baseline</button>
+  <button class="tab-btn" data-scenario="improved">Improved</button>
+  <button class="tab-btn" data-scenario="reduced">Reduced</button>
+</div>
+
+<!-- Milestones -->
+<div class="timeline-track" style="margin-bottom:2rem;">
+  {% set messages = {
+    30:  "You're building momentum — keep going!",
+    60:  "Two months in — your consistency is paying off.",
+    90:  "Halfway to six months — great progress!",
+    120: "Four months of growth — you're unstoppable.",
+    150: "Five months done — the finish line is in sight.",
+    180: "Six months! Look how far you've come."
+  } %}
+  {% for m in milestones %}
+  <div class="milestone">
+    <div class="milestone-day">Day {{ m.day }}</div>
+    <div class="milestone-data">
+      <span class="m-baseline" style="background:#e8f0fe; color:#0066cc;">Baseline: {{ m.baseline }} hrs</span>
+      <span class="m-improved" style="background:#e6fff7; color:#00a381;">Improved: {{ m.improved }} hrs</span>
+      <span class="m-reduced"  style="background:#ffeaea; color:#e17055;">Reduced: {{ m.reduced }} hrs</span>
+    </div>
+    <div class="milestone-msg">{{ messages[m.day] }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Line chart -->
+<div class="chart-card" style="margin-bottom:1.5rem;">
+  <h3 style="margin-bottom:0.8rem;">Progress Over Time</h3>
+  <canvas id="timelineChart"></canvas>
+</div>
+
+<div class="btn-group">
+  <a href="{{ url_for('dashboard') }}" class="btn btn-outline">&larr; Dashboard</a>
+  <a href="{{ url_for('summary') }}" class="btn btn-primary">Summary &amp; Action Plan &rarr;</a>
+</div>
+
+<script>
+const chartData = {{ chart | tojson }};
+let tlChart = null;
+
+function renderTimeline(scenario) {
+  const ctx = document.getElementById('timelineChart').getContext('2d');
+  if (tlChart) tlChart.destroy();
+
+  const configs = {
+    baseline: { label: 'Baseline', data: chartData.baseline, color: '#0066cc' },
+    improved: { label: 'Improved', data: chartData.improved, color: '#00b894' },
+    reduced:  { label: 'Reduced',  data: chartData.reduced,  color: '#e17055' }
+  };
+  const c = configs[scenario];
+
+  tlChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: chartData.labels.map(d => 'Day ' + d),
+      datasets: [{
+        label: c.label,
+        data: c.data,
+        borderColor: c.color,
+        backgroundColor: c.color + '18',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 5,
+        pointBackgroundColor: c.color
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: { y: { beginAtZero: true, title: { display: true, text: 'Cumulative Hours' } } },
+      plugins: { legend: { position: 'bottom' } }
+    }
+  });
+
+  // Highlight matching milestone data
+  document.querySelectorAll('.m-baseline, .m-improved, .m-reduced').forEach(el => el.style.opacity = '0.35');
+  document.querySelectorAll('.m-' + scenario).forEach(el => el.style.opacity = '1');
+}
+
+// Tab clicks
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    renderTimeline(this.dataset.scenario);
+  });
+});
+
+// Initial render
+renderTimeline('baseline');
+</script>
+
+{% endblock %}

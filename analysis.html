@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Habit Analysis — TIMELOOP{% endblock %}
+{% block content %}
+
+<h2>Your Habit Analysis</h2>
+<p class="subtitle">Here's a visual breakdown of how you spend your day.</p>
+
+<!-- Summary cards -->
+<div class="grid grid-4" style="margin-bottom:1.5rem;">
+  <div class="card">
+    <h4>&#128218; Study / Work</h4>
+    <div class="card-value">{{ habits.study }}</div>
+    <div class="card-label">hours / day</div>
+  </div>
+  <div class="card">
+    <h4>&#128564; Sleep</h4>
+    <div class="card-value">{{ habits.sleep }}</div>
+    <div class="card-label">hours / day</div>
+  </div>
+  <div class="card">
+    <h4>&#128241; Social Media</h4>
+    <div class="card-value">{{ habits.social }}</div>
+    <div class="card-label">hours / day</div>
+  </div>
+  <div class="card">
+    <h4>&#127891; Skill Learning</h4>
+    <div class="card-value">{{ habits.skill }}</div>
+    <div class="card-label">hours / day</div>
+  </div>
+</div>
+
+<!-- Unallocated hours -->
+<div class="grid grid-2" style="margin-bottom:1.5rem;">
+  <div class="card" style="border-left:4px solid var(--secondary);">
+    <h4>Total Allocated</h4>
+    <div class="card-value" style="color:var(--secondary);">{{ total }}</div>
+    <div class="card-label">hours / day</div>
+  </div>
+  <div class="card" style="border-left:4px solid var(--accent);">
+    <h4>Unallocated / Other</h4>
+    <div class="card-value" style="color:var(--accent);">{{ unallocated }}</div>
+    <div class="card-label">hours / day (meals, commute, free time, etc.)</div>
+  </div>
+</div>
+
+<!-- Chart -->
+<div class="chart-card" style="margin-bottom:1.5rem;">
+  <h3 style="margin-bottom:0.8rem;">Daily Time Allocation</h3>
+  <canvas id="pieChart"></canvas>
+</div>
+
+<div class="btn-group">
+  <a href="{{ url_for('habits') }}" class="btn btn-outline">&#9998; Edit Habits</a>
+  <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Continue to Dashboard &rarr;</a>
+</div>
+
+<script>
+new Chart(document.getElementById('pieChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Study/Work', 'Sleep', 'Social Media', 'Skill Learning', 'Other'],
+    datasets: [{
+      data: [{{ habits.study }}, {{ habits.sleep }}, {{ habits.social }}, {{ habits.skill }}, {{ unallocated }}],
+      backgroundColor: ['#0066cc', '#636e72', '#7f5af0', '#00b894', '#dfe6e9'],
+      borderWidth: 2,
+      borderColor: '#fff'
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: { position: 'bottom' }
+    }
+  }
+});
+</script>
+
+{% endblock %}

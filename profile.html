@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Profile Setup — TIMELOOP{% endblock %}
+{% block content %}
+
+<h2>Set Up Your Profile</h2>
+<p class="subtitle">Tell us a bit about yourself so we can personalise your simulation.</p>
+
+<div class="form-card">
+  {% if errors %}
+  <ul class="error-list">
+    {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('profile') }}">
+    <div class="form-group">
+      <label for="name">Name or Nickname</label>
+      <input type="text" id="name" name="name" value="{{ name }}" placeholder="e.g. Alex" required />
+    </div>
+
+    <div class="form-group">
+      <label for="goal">Primary Goal</label>
+      <select id="goal" name="goal" required>
+        <option value="" disabled {% if not goal %}selected{% endif %}>Select a goal…</option>
+        <option value="programming" {% if goal == 'programming' %}selected{% endif %}>Programming</option>
+        <option value="academics" {% if goal == 'academics' %}selected{% endif %}>Academics</option>
+        <option value="communication" {% if goal == 'communication' %}selected{% endif %}>Communication</option>
+        <option value="career" {% if goal == 'career' %}selected{% endif %}>Career Preparation</option>
+        <option value="other" {% if goal == 'other' %}selected{% endif %}>Other</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="duration">Simulation Duration (30–180 days)</label>
+      <input type="number" id="duration" name="duration" min="30" max="180" value="{{ duration }}" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="width:100%;">Continue &rarr;</button>
+  </form>
+</div>
+
+{% endblock %}

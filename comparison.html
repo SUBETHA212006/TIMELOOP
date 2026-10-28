@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Scenario Comparison — TIMELOOP{% endblock %}
+{% block content %}
+
+<h2>Scenario Comparison</h2>
+<p class="subtitle">See all three scenarios side by side over {{ duration }} days.</p>
+
+<!-- Comparison table -->
+<table class="compare-table" style="margin-bottom:1.5rem;">
+  <thead>
+    <tr>
+      <th>Metric</th>
+      <th style="color:#0066cc;">&#9679; Baseline</th>
+      <th style="color:#00b894;">&#9679; Improved</th>
+      <th style="color:#e17055;">&#9679; Reduced</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Daily Learning Time</td>
+      <td>{{ scenarios.baseline.daily }} hrs</td>
+      <td>{{ scenarios.improved.daily }} hrs</td>
+      <td>{{ scenarios.reduced.daily }} hrs</td>
+    </tr>
+    <tr>
+      <td>Cumulative Hours ({{ duration }} days)</td>
+      <td><strong>{{ scenarios.baseline.hours }}</strong></td>
+      <td><strong>{{ scenarios.improved.hours }}</strong></td>
+      <td><strong>{{ scenarios.reduced.hours }}</strong></td>
+    </tr>
+    <tr>
+      <td>Difference from Baseline</td>
+      <td><span class="diff-neutral">—</span></td>
+      <td><span class="diff-positive">+{{ scenarios.improved.diff }}</span></td>
+      <td><span class="diff-negative">{{ scenarios.reduced.diff }}</span></td>
+    </tr>
+    <tr>
+      <td>Assumption</td>
+      <td style="font-size:0.85rem;">{{ scenarios.baseline.description }}</td>
+      <td style="font-size:0.85rem;">{{ scenarios.improved.description }}</td>
+      <td style="font-size:0.85rem;">{{ scenarios.reduced.description }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- Comparison chart -->
+<div class="chart-card" style="margin-bottom:1.5rem;">
+  <h3 style="margin-bottom:0.8rem;">Cumulative Learning Hours — All Scenarios</h3>
+  <canvas id="compareChart"></canvas>
+</div>
+
+<div class="btn-group">
+  <a href="{{ url_for('dashboard') }}" class="btn btn-outline">&larr; Back to Dashboard</a>
+  <a href="{{ url_for('timeline') }}" class="btn btn-accent">Future Timeline &rarr;</a>
+  <a href="{{ url_for('summary') }}" class="btn btn-primary">View Summary &rarr;</a>
+</div>
+
+<script>
+new Chart(document.getElementById('compareChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Baseline', 'Improved', 'Reduced'],
+    datasets: [{
+      label: 'Cumulative Hours ({{ duration }} days)',
+      data: [{{ scenarios.baseline.hours }}, {{ scenarios.improved.hours }}, {{ scenarios.reduced.hours }}],
+      backgroundColor: ['#0066cc', '#00b894', '#e17055'],
+      borderRadius: 6,
+      barPercentage: 0.6
+    }]
+  },
+  options: {
+    responsive: true,
+    scales: { y: { beginAtZero: true, title: { display: true, text: 'Hours' } } },
+    plugins: { legend: { display: false } }
+  }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Summary & Action Plan — TIMELOOP{% endblock %}
+{% block content %}
+
+<!-- Summary hero -->
+<div class="summary-hero">
+  <h2>Your TIMELOOP Summary</h2>
+  <p>{{ name }}, here's what {{ duration }} days could look like.</p>
+  <div class="card-value">{{ selected.hours }} hours</div>
+  <div class="card-label" style="color:rgba(255,255,255,0.85);">
+    Projected cumulative learning — {{ selected.name }} scenario
+  </div>
+</div>
+
+<!-- Scenario selector -->
+<div class="tabs" style="margin-bottom:1.5rem;">
+  <a href="{{ url_for('summary', scenario='baseline') }}"
+     class="tab-btn {% if selected_key=='baseline' %}active{% endif %}">Baseline</a>
+  <a href="{{ url_for('summary', scenario='improved') }}"
+     class="tab-btn {% if selected_key=='improved' %}active{% endif %}">Improved</a>
+  <a href="{{ url_for('summary', scenario='reduced') }}"
+     class="tab-btn {% if selected_key=='reduced' %}active{% endif %}">Reduced</a>
+</div>
+
+<!-- Details -->
+<div class="grid grid-2" style="margin-bottom:1.5rem;">
+  <div class="card">
+    <h3>&#128202; Selected Scenario: {{ selected.name }}</h3>
+    <p><strong>Daily learning:</strong> {{ selected.daily }} hours</p>
+    <p><strong>Duration:</strong> {{ duration }} days</p>
+    <p><strong>Cumulative hours:</strong> {{ selected.hours }}</p>
+    <p style="margin-top:0.5rem; color:var(--text-light);">{{ selected.description }}</p>
+  </div>
+  <div class="card">
+    <h3>&#128218; Your Habits</h3>
+    <p>Study / Work: <strong>{{ habits.study }}</strong> hrs</p>
+    <p>Sleep: <strong>{{ habits.sleep }}</strong> hrs</p>
+    <p>Social Media: <strong>{{ habits.social }}</strong> hrs</p>
+    <p>Skill Learning: <strong>{{ habits.skill }}</strong> hrs</p>
+    <p style="margin-top:0.5rem; color:var(--text-light);">Goal: {{ goal | capitalize }}</p>
+  </div>
+</div>
+
+<!-- Suggestions -->
+<div class="card" style="margin-bottom:1.5rem;">
+  <h3>&#128161; Practical Suggestions</h3>
+  <ul class="suggestion-list">
+    <li>
+      <strong>Block dedicated learning time.</strong>
+      Schedule a fixed 30‑minute learning block at the same time each day to build consistency.
+    </li>
+    <li>
+      <strong>Reduce passive screen time.</strong>
+      Replace one social‑media session with a focused review or practice session for your {{ goal }} goal.
+    </li>
+    <li>
+      <strong>Track and reflect weekly.</strong>
+      Spend 10 minutes each Sunday reviewing what you learned and adjusting your plan for the coming week.
+    </li>
+  </ul>
+</div>
+
+<!-- Actions -->
+<div class="btn-group" style="margin-bottom:1.5rem;">
+  <a href="{{ url_for('profile') }}" class="btn btn-secondary">&#8634; Restart Simulation</a>
+  <a href="{{ url_for('dashboard') }}" class="btn btn-primary">&larr; Back to Dashboard</a>
+</div>
+
+<!-- Disclaimer -->
+<div class="disclaimer">
+  <strong>Disclaimer:</strong> These results are hypothetical projections based on the inputs you provided.
+  They do <strong>not</strong> guarantee any specific academic, career, or personal outcomes.
+  Use them as a thinking tool, not a prediction.
+</div>
+
+{% endblock %}

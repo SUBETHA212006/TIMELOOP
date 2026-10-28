@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}TIMELOOP — See Where Your Time Can Take You{% endblock %}
+{% block content %}
+
+<!-- Hero -->
+<section class="hero">
+  <h1>See Where Your Time Can Take You</h1>
+  <p class="subtitle">
+    TIMELOOP helps you explore how small changes in daily habits could affect
+    your available learning time over the next six months. Enter your routine,
+    compare scenarios, and discover your potential.
+  </p>
+  <div class="btn-group" style="justify-content:center;">
+    <a href="{{ url_for('profile') }}" class="btn btn-primary">&#9654; Start Simulation</a>
+    <a href="#features" class="btn btn-outline">&#9733; Explore Features</a>
+  </div>
+  <img src="{{ url_for('static', filename='img/illustration.svg') }}" alt="Time, habits and future growth" class="hero-img" />
+</section>
+
+<!-- Features -->
+<section class="features" id="features">
+  <h2 style="text-align:center;">How It Works</h2>
+  <div class="grid grid-3">
+    <div class="card feature-card">
+      <div class="feature-icon" style="background:#e8f0fe; color:var(--primary);">&#128221;</div>
+      <h3>Log Your Habits</h3>
+      <p>Enter how you spend your time each day — study, sleep, social media and skill learning.</p>
+    </div>
+    <div class="card feature-card">
+      <div class="feature-icon" style="background:#e6fff7; color:var(--secondary);">&#128200;</div>
+      <h3>Run Simulations</h3>
+      <p>See three scenarios projected over 30–180 days with interactive charts.</p>
+    </div>
+    <div class="card feature-card">
+      <div class="feature-icon" style="background:#f0e6ff; color:var(--accent);">&#127942;</div>
+      <h3>Plan Your Growth</h3>
+      <p>Compare outcomes, hit milestones, and get actionable suggestions.</p>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

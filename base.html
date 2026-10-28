@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}TIMELOOP{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="{{ url_for('welcome') }}" class="logo">TIME<span>LOOP</span></a>
+    <ul class="nav-links">
+      <li><a href="{{ url_for('welcome') }}">Home</a></li>
+      {% if session.get('name') %}
+      <li><a href="{{ url_for('profile') }}">Profile</a></li>
+      <li><a href="{{ url_for('habits') }}">Habits</a></li>
+      <li><a href="{{ url_for('analysis') }}">Analysis</a></li>
+      <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+      <li><a href="{{ url_for('comparison') }}">Compare</a></li>
+      <li><a href="{{ url_for('timeline') }}">Timeline</a></li>
+      <li><a href="{{ url_for('summary') }}">Summary</a></li>
+      {% else %}
+      <li><a href="{{ url_for('profile') }}">Get Started</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+
+  <!-- Main content -->
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    &copy; 2026 TIMELOOP &mdash; Experience the Consequences of Your Habits
+  </footer>
+
+</body>
+</html>
